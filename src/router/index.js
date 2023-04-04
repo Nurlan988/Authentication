@@ -1,20 +1,57 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Auth from "../components/Auth.vue" 
+import AppLogin from "../components/AppLogin.vue";
+import AppRegister from "../components/AppRegister.vue";
+import User from "../components/User.vue"
+import Home from "../components/Home.vue"
+import About from "../components/About.vue"
+import store from '../store/index';
+
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
+  { 
+    path: '/login', 
+    name: 'auth', 
+    component: Auth, 
+    children: [
+      { 
+        path: ':', 
+        name: 'login', 
+        component: AppLogin,
+      },
+      { 
+        path: '/register', 
+        name: 'register', 
+        component: AppRegister,
+      },
+    ]
   },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+  { 
+    path: '/', 
+    name: 'user', 
+    component: User, 
+    children: [
+      {
+        path: ':', 
+        name: 'home', 
+        component: Home,
+      },
+      {
+        path: '/about', 
+        name: 'about', 
+        component: About
+      },
+    ],
+    beforeEnter(to, from, next){
+      if(store.getters.isAuthentication){
+        next() 
+      }else{
+        next({name: 'login'})
+      }
+    },
+  },
+  { path: '/:pathMatch(.*)*', redirect: "/"}
+  
 ]
 
 const router = createRouter({
